@@ -29,11 +29,7 @@ public class BitmovinApi {
     @Value("bitmovin.api_key")
     private String API_KEY;
 
-    @Value("bitmovin.input_id")
-    private String INPUT_ID = "";
 
-    @Value("bitmovin.output_id")
-    private String OUTPUT_ID = "";
 
     public static final String RESPONSE_STATUS_SUCCESS = "SUCCESS";
     public static final String RESPONSE_STATUS_ERROR = "ERROR";
@@ -75,8 +71,8 @@ public class BitmovinApi {
         }
     }
 
-    public PostStreamsResponseModel createStreams(String encodingId, String inputPath, String codecConfigId) {
-        PostStreamsRequestModel.StreamInput streamInput = new PostStreamsRequestModel.StreamInput(INPUT_ID, inputPath, "AUTO");
+    public PostStreamsResponseModel createStreams(String inputId, String encodingId, String inputPath, String codecConfigId) {
+        PostStreamsRequestModel.StreamInput streamInput = new PostStreamsRequestModel.StreamInput(inputId, inputPath, "AUTO");
 
         ArrayList<PostStreamsRequestModel.StreamInput> streamInputArrayList = new ArrayList<>();
         streamInputArrayList.add(streamInput);
@@ -97,12 +93,12 @@ public class BitmovinApi {
         }
     }
 
-    public PostMuxingFM4ResponseModel createMuxingFM4(String encodingId, String streamId, String outputPath) {
+    public PostMuxingFM4ResponseModel createMuxingFM4(String outputId, String encodingId, String streamId, String outputPath) {
         ArrayList<AclEntryModel> aclEntries = new ArrayList<>();
         aclEntries.add(new AclEntryModel());
 
         ArrayList<EncodingOutputModel> encodingOutputs = new ArrayList<>();
-        encodingOutputs.add(new EncodingOutputModel(OUTPUT_ID, outputPath, aclEntries));
+        encodingOutputs.add(new EncodingOutputModel(outputId, outputPath, aclEntries));
 
         ArrayList<MuxingStreamModel> muxingStreams = new ArrayList<>();
         muxingStreams.add(new MuxingStreamModel(streamId));

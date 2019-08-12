@@ -5,8 +5,8 @@ import com.weuller.sambatechtest.SpringTestConfig;
 import com.weuller.sambatechtest.network.bitmovin.BitmovinApi;
 import com.weuller.sambatechtest.network.bitmovin.models.dash.*;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
+import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostStartEncodingResponse;
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
-import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsResponseModel;
 import org.junit.Assert;
 import org.junit.Before;
@@ -167,7 +167,7 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                         .body(mapper.writeValueAsString(response))
                 );
 
-        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
+        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(inputId, encodingId, inputPath, codecConfigId);
 
         Assert.assertNotNull(streamsResponse);
         Assert.assertNotNull(streamsResponse.getData().getResult().getId());
@@ -208,7 +208,7 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                         .body(mapper.writeValueAsString(response))
                 );
 
-        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
+        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(inputId, encodingId, inputPath, codecConfigId);
 
         Assert.assertNull(streamsResponse);
     }
@@ -248,7 +248,7 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                         .body(mapper.writeValueAsString(response))
                 );
 
-        bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
+        bitmovinApi.createStreams(inputId, encodingId, inputPath, codecConfigId);
     }
 
     @Test
@@ -256,6 +256,7 @@ public class BitmovinApiMockRestServiceServerUnitTest {
         String encodingId = "f3177c2e-0000-4ba6-bd20-1dee353d8a72";
         String streamId = "d09c1a8a-4c56-4392-94d8-81712118aae0";
         String outputPath = "/encodings/movies/movie-1/video_720/";
+        String outputId = "55354be6-0237-42bb-ae85-a2d4ef1ed19e";
 
         PostMuxingFM4ResponseModel.ResultWrapper.Fmp4Muxing fmp4Muxing = new PostMuxingFM4ResponseModel.ResultWrapper.Fmp4Muxing();
         PostMuxingFM4ResponseModel.ResultWrapper resultWrapper = new PostMuxingFM4ResponseModel.ResultWrapper();
@@ -278,7 +279,7 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                         .body(mapper.writeValueAsString(response))
                 );
 
-        PostMuxingFM4ResponseModel fm4Response = bitmovinApi.createMuxingFM4(encodingId, streamId, outputPath);
+        PostMuxingFM4ResponseModel fm4Response = bitmovinApi.createMuxingFM4(outputId, encodingId, streamId, outputPath);
 
         Assert.assertNotNull(fm4Response);
         Assert.assertNotNull(fm4Response.getData().getResult().getId());
@@ -445,6 +446,38 @@ public class BitmovinApiMockRestServiceServerUnitTest {
 
         Assert.assertNotNull(representationResponse);
         Assert.assertNotNull(representationResponse.getData().getResult().getId());
+    }
+
+    @Test
+    public void Given_MockingByMockRestServiceServer_When_StartEncodingIsCalledAndResponseStatusIsSuccess_Then_EncodingIsMade() throws Exception {
+        String manifestId = "45ef21d2-1f62-4004-9166-6d5e248270f6";
+        String encodingId = "f3177c2e-0000-4ba6-bd20-1dee353d8a72";
+
+        PostStartEncodingResponse.ResultWrapper.BitmovinResponse bitmovinResponse = new PostStartEncodingResponse.ResultWrapper.BitmovinResponse();
+        PostStartEncodingResponse.ResultWrapper resultWrapper = new PostStartEncodingResponse.ResultWrapper();
+        PostStartEncodingResponse response = new PostStartEncodingResponse();
+
+        bitmovinResponse.setId("6d84e126-d10c-4e52-bbfb-bd4c92bc8333");
+
+        resultWrapper.setResult(bitmovinResponse);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_SUCCESS);
+
+        String url = String.format(BitmovinApi.BASE_URL + ENDPOINT_START_ENCODING, manifestId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        PostStartEncodingResponse bitmovinResponseResult = bitmovinApi.startEncoding(manifestId, encodingId);
+
+        Assert.assertNotNull(bitmovinResponseResult);
+        Assert.assertNotNull(bitmovinResponseResult.getData().getResult().getId());
     }
 
 }
