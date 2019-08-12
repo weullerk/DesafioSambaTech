@@ -1,7 +1,7 @@
 package com.weuller.sambatechtest.network.bitmovin.models;
 
-
 public class PostEncodingResponseModel {
+
     String status;
     ResultWrapper data;
 
@@ -28,7 +28,7 @@ public class PostEncodingResponseModel {
             return result;
         }
 
-        public void seResult(Encoding result) {
+        public void setResult(Encoding result) {
             this.result = result;
         }
 

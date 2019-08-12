@@ -1,8 +1,7 @@
 package com.weuller.sambatechtest.network.bitmovin;
 
-import com.weuller.sambatechtest.network.bitmovin.models.PostEncodingRequestModel;
-import com.weuller.sambatechtest.network.bitmovin.models.PostEncodingResponseModel;
-import com.weuller.sambatechtest.services.EncodingService;
+import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingRequestModel;
+import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +19,20 @@ public class BitmovinApi {
     private String INPUT_ID = "";
     private String OUTPUT_ID = "";
 
+    public static final String RESPONSE_STATUS_SUCCESS = "SUCCESS";
+    public static final String RESPONSE_STATUS_ERROR = "ERROR";
+
     public static final String ENCODING_NAME = "SambaTech Vídeo Encoder";
     public static final String ENCODER_VERSION = "2.22.0";
 
     public static final String BASE_URL = "https://api.bitmovin.com/v1";
     public static final String ENDPOINT_CREATE_ENCODING = "/encoding/encodings";
+    public static final String ENDPOINT_CREATE_STREAMS = "/encoding/encodings/{%s}/streams";
 
     @Autowired
     RestTemplate restTemplate;
 
-    Logger log = LoggerFactory.getLogger(EncodingService.class);
+    Logger log = LoggerFactory.getLogger(BitmovinApi.class);
 
     public BitmovinApi() {}
 
@@ -41,11 +44,15 @@ public class BitmovinApi {
 
         ResponseEntity<PostEncodingResponseModel> response = restTemplate.exchange(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_ENCODING, HttpMethod.POST, request, PostEncodingResponseModel.class);
 
-        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals("SUCCESS")) {
+        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
             return response.getBody();
         } else {
             return null;
         }
+    }
+
+    public void createStreams(String encodingId, String inputId, String inputPath) {
+
     }
 
     private HttpHeaders getHeaders() {
