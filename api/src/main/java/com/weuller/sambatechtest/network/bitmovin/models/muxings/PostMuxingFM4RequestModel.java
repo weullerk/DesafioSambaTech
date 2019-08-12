@@ -4,20 +4,23 @@ import java.util.List;
 
 public class PostMuxingFM4RequestModel {
 
-    String segmentLength;
+    Integer segmentLength;
     String segmentNaming;
     String initSegmentName;
     List<MuxingStream> streams;
     List<EncodingOutput> outputs;
 
     public PostMuxingFM4RequestModel() {
+        this.segmentLength = 4;
+        this.segmentNaming = "seg_%number%.m4s";
+        this.initSegmentName = "init.mp4";
     }
 
-    public String getSegmentLength() {
+    public Integer getSegmentLength() {
         return segmentLength;
     }
 
-    public void setSegmentLength(String segmentLength) {
+    public void setSegmentLength(Integer segmentLength) {
         this.segmentLength = segmentLength;
     }
 
@@ -119,6 +122,7 @@ public class PostMuxingFM4RequestModel {
             }
 
             public AclEntry() {
+                this.permission = "PUBLIC_READ";
             }
 
             public String getPermission() {

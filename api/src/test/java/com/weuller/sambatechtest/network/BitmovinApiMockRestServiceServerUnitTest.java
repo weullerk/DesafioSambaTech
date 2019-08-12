@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weuller.sambatechtest.SpringTestConfig;
 import com.weuller.sambatechtest.network.bitmovin.BitmovinApi;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
+import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsResponseModel;
 import org.junit.Assert;
@@ -165,7 +166,7 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                                 .body(mapper.writeValueAsString(response))
                 );
 
-        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputId, inputPath, codecConfigId);
+        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
 
         Assert.assertNotNull(streamsResponse);
         Assert.assertNotNull(streamsResponse.getData().getResult().getId());
@@ -206,7 +207,7 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                                 .body(mapper.writeValueAsString(response))
                 );
 
-        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputId, inputPath, codecConfigId);
+        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
 
         Assert.assertNull(streamsResponse);
     }
@@ -246,7 +247,40 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                                 .body(mapper.writeValueAsString(response))
                 );
 
-        bitmovinApi.createStreams(encodingId, inputId, inputPath, codecConfigId);
+        bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
+    }
+
+    @Test
+    public void Given_MockingByMockRestServiceServer_When_CreateMuxingFmp4IsCalledAndResponseStatusIsSuccess_Then_MuxingFmp4WillBeCreated() throws Exception {
+        String encodingId = "f3177c2e-0000-4ba6-bd20-1dee353d8a72";
+        String streamId = "d09c1a8a-4c56-4392-94d8-81712118aae0";
+        String outputPath = "/encodings/movies/movie-1/video_720/";
+
+        PostMuxingFM4ResponseModel.ResultWrapper.Fmp4Muxing fmp4Muxing = new PostMuxingFM4ResponseModel.ResultWrapper.Fmp4Muxing();
+        PostMuxingFM4ResponseModel.ResultWrapper resultWrapper = new PostMuxingFM4ResponseModel.ResultWrapper();
+        PostMuxingFM4ResponseModel response = new PostMuxingFM4ResponseModel();
+
+        fmp4Muxing.setId("cb90b80c-8867-4e3b-8479-174aa2843f62");
+        
+        resultWrapper.setResult(fmp4Muxing);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_SUCCESS);
+
+        String url = String.format(BitmovinApi.BASE_URL + ENDPOINT_CREATE_MUXING_FMP4, encodingId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        PostMuxingFM4ResponseModel fm4Response = bitmovinApi.createMuxingFM4(encodingId, streamId, outputPath);
+
+        Assert.assertNotNull(fm4Response);
+        Assert.assertNotNull(fm4Response.getData().getResult().getId());
     }
 
 }
