@@ -2,10 +2,13 @@ package com.weuller.sambatechtest.network.bitmovin;
 
 import com.weuller.sambatechtest.network.bitmovin.models.AclEntryModel;
 import com.weuller.sambatechtest.network.bitmovin.models.EncodingOutputModel;
+import com.weuller.sambatechtest.network.bitmovin.models.ManifestResourceModel;
 import com.weuller.sambatechtest.network.bitmovin.models.MuxingStreamModel;
 import com.weuller.sambatechtest.network.bitmovin.models.dash.*;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingRequestModel;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
+import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostStartEncodingRequestModel;
+import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostStartEncodingResponse;
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4RequestModel;
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
@@ -44,8 +47,8 @@ public class BitmovinApi {
     public static final String ENDPOINT_CREATE_MUXING_FMP4 = "/encoding/encodings/%s/muxings/fmp4";
     public static final String ENDPOINT_CREATE_MANIFEST = "/encoding/manifests/dash";
     public static final String ENDPOINT_CREATE_PERIOD = "/encoding/manifests/dash/%s/periods";
-    public static final String ENDPOINT_CREATE_AUDIO_ADAPTATION_SET = "/encoding/manifests/dash/%s/periods/%/adaptationsets/audio";
-    public static final String ENDPOINT_CREATE_VIDEO_ADAPTATION_SET = "/encoding/manifests/dash/%s/periods/%/adaptationsets/video";
+    public static final String ENDPOINT_CREATE_AUDIO_ADAPTATION_SET = "/encoding/manifests/dash/%s/periods/%s/adaptationsets/audio";
+    public static final String ENDPOINT_CREATE_VIDEO_ADAPTATION_SET = "/encoding/manifests/dash/%s/periods/%s/adaptationsets/video";
     public static final String ENDPOINT_CREATE_REPRESENTATION = "/encoding/manifests/dash/%s/periods/%s/adaptationsets/%s/representations/fmp4";
     public static final String ENDPOINT_START_ENCODING = "/encoding/encodings/%s/start";
 
@@ -182,7 +185,7 @@ public class BitmovinApi {
     public PostVideoAdaptationSetResponseModel createVideoAdaptationSet(String manifestId, String periodId) {
         HttpHeaders header = getHeaders();
 
-        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_VIDEO_ADAPTATION_SET;
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_VIDEO_ADAPTATION_SET, manifestId, periodId);
 
         HttpEntity request = new HttpEntity(header);
 
@@ -212,6 +215,26 @@ public class BitmovinApi {
         }
     }
 
+    public PostStartEncodingResponse startEncoding(String encodingId, String manifestId) {
+        ManifestResourceModel manifestResource = new ManifestResourceModel(manifestId);
+        ArrayList<ManifestResourceModel> manifestResourceArrayList = new ArrayList<>();
+        manifestResourceArrayList.add(manifestResource);
+
+        PostStartEncodingRequestModel body = new PostStartEncodingRequestModel(manifestResourceArrayList, "TWO_PASS");
+        HttpHeaders header = getHeaders();
+
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_START_ENCODING, encodingId);
+
+        HttpEntity<PostStartEncodingRequestModel> request = new HttpEntity<>(body, header);
+
+        ResponseEntity<PostStartEncodingResponse> response = restTemplate.exchange(url, HttpMethod.POST, request, PostStartEncodingResponse.class);
+
+        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+            return response.getBody();
+        } else {
+            return null;
+        }
+    }
 
     private HttpHeaders getHeaders() {
         HttpHeaders httpHeader = new HttpHeaders();
