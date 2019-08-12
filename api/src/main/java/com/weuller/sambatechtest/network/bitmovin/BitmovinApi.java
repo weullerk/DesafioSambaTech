@@ -1,5 +1,9 @@
 package com.weuller.sambatechtest.network.bitmovin;
 
+import com.weuller.sambatechtest.network.bitmovin.models.AclEntryModel;
+import com.weuller.sambatechtest.network.bitmovin.models.EncodingOutputModel;
+import com.weuller.sambatechtest.network.bitmovin.models.MuxingStreamModel;
+import com.weuller.sambatechtest.network.bitmovin.models.dash.*;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingRequestModel;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4RequestModel;
@@ -38,6 +42,13 @@ public class BitmovinApi {
     public static final String ENDPOINT_CREATE_ENCODING = "/encoding/encodings";
     public static final String ENDPOINT_CREATE_STREAMS = "/encoding/encodings/%s/streams";
     public static final String ENDPOINT_CREATE_MUXING_FMP4 = "/encoding/encodings/%s/muxings/fmp4";
+    public static final String ENDPOINT_CREATE_MANIFEST = "/encoding/manifests/dash";
+    public static final String ENDPOINT_CREATE_PERIOD = "/encoding/manifests/dash/%s/periods";
+    public static final String ENDPOINT_CREATE_AUDIO_ADAPTATION_SET = "/encoding/manifests/dash/%s/periods/%/adaptationsets/audio";
+    public static final String ENDPOINT_CREATE_VIDEO_ADAPTATION_SET = "/encoding/manifests/dash/%s/periods/%/adaptationsets/video";
+    public static final String ENDPOINT_CREATE_REPRESENTATION = "/encoding/manifests/dash/%s/periods/%s/adaptationsets/%s/representations/fmp4";
+    public static final String ENDPOINT_START_ENCODING = "/encoding/encodings/%s/start";
+
 
     @Autowired
     RestTemplate restTemplate;
@@ -84,14 +95,14 @@ public class BitmovinApi {
     }
 
     public PostMuxingFM4ResponseModel createMuxingFM4(String encodingId, String streamId, String outputPath) {
-        ArrayList<PostMuxingFM4RequestModel.EncodingOutput.AclEntry> aclEntries = new ArrayList<>();
-        aclEntries.add(new PostMuxingFM4RequestModel.EncodingOutput.AclEntry());
+        ArrayList<AclEntryModel> aclEntries = new ArrayList<>();
+        aclEntries.add(new AclEntryModel());
 
-        ArrayList<PostMuxingFM4RequestModel.EncodingOutput> encodingOutputs = new ArrayList<>();
-        encodingOutputs.add(new PostMuxingFM4RequestModel.EncodingOutput(OUTPUT_ID, outputPath, aclEntries));
+        ArrayList<EncodingOutputModel> encodingOutputs = new ArrayList<>();
+        encodingOutputs.add(new EncodingOutputModel(OUTPUT_ID, outputPath, aclEntries));
 
-        ArrayList<PostMuxingFM4RequestModel.MuxingStream> muxingStreams = new ArrayList<>();
-        muxingStreams.add(new PostMuxingFM4RequestModel.MuxingStream(streamId));
+        ArrayList<MuxingStreamModel> muxingStreams = new ArrayList<>();
+        muxingStreams.add(new MuxingStreamModel(streamId));
 
         PostMuxingFM4RequestModel body = new PostMuxingFM4RequestModel();
         body.setOutputs(encodingOutputs);
@@ -111,6 +122,96 @@ public class BitmovinApi {
             return null;
         }
     }
+
+    public PostManifestResponseModel createManifestDash(String outputId, String outputPath) {
+        ArrayList<AclEntryModel> aclEntries = new ArrayList<>();
+        aclEntries.add(new AclEntryModel());
+
+        EncodingOutputModel encodingOutput = new EncodingOutputModel(OUTPUT_ID, outputPath, aclEntries);
+
+        PostManifestRequestModel body = new PostManifestRequestModel("Manifest", "dash.mpd", encodingOutput);
+
+        HttpHeaders header = getHeaders();
+
+        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_MANIFEST;
+
+        HttpEntity<PostManifestRequestModel> request = new HttpEntity<>(body, header);
+
+        ResponseEntity<PostManifestResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostManifestResponseModel.class);
+
+        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+            return response.getBody();
+        } else {
+            return null;
+        }
+    }
+
+    public PostPeriodResponseModel createPeriod() {
+        HttpHeaders header = getHeaders();
+
+        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_PERIOD;
+
+        HttpEntity<Object> request = new HttpEntity<>(new Object(), header);
+
+        ResponseEntity<PostPeriodResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostPeriodResponseModel.class);
+
+        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+            return response.getBody();
+        } else {
+            return null;
+        }
+    }
+
+    public PostAudioAdaptationSetResponseModel createAudioAdaptationSet(String manifestId, String periodId) {
+        PostAudioAdaptationSetRequestModel body = new PostAudioAdaptationSetRequestModel("pt");
+        HttpHeaders header = getHeaders();
+
+        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_AUDIO_ADAPTATION_SET;
+
+        HttpEntity<PostAudioAdaptationSetRequestModel> request = new HttpEntity<>(body, header);
+
+        ResponseEntity<PostAudioAdaptationSetResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostAudioAdaptationSetResponseModel.class);
+
+        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+            return response.getBody();
+        } else {
+            return null;
+        }
+    }
+
+    public PostVideoAdaptationSetResponseModel createVideoAdaptationSet(String manifestId, String periodId) {
+        HttpHeaders header = getHeaders();
+
+        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_VIDEO_ADAPTATION_SET;
+
+        HttpEntity<Object> request = new HttpEntity<>(new Object(), header);
+
+        ResponseEntity<PostVideoAdaptationSetResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostVideoAdaptationSetResponseModel.class);
+
+        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+            return response.getBody();
+        } else {
+            return null;
+        }
+    }
+
+    public PostRepresentationResponseModel createRepresentation(String manifestId, String periodId, String adaptationSetId, String encodingId, String muxingId, String segmentPath) {
+        PostRepresentationRequestModel body = new PostRepresentationRequestModel("TEMPLATE", encodingId, muxingId, segmentPath);
+        HttpHeaders header = getHeaders();
+
+        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_AUDIO_ADAPTATION_SET;
+
+        HttpEntity<PostRepresentationRequestModel> request = new HttpEntity<>(body, header);
+
+        ResponseEntity<PostRepresentationResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostRepresentationResponseModel.class);
+
+        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+            return response.getBody();
+        } else {
+            return null;
+        }
+    }
+
 
     private HttpHeaders getHeaders() {
         HttpHeaders httpHeader = new HttpHeaders();

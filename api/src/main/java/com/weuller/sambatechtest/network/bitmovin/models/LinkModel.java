@@ -2,8 +2,8 @@ package com.weuller.sambatechtest.network.bitmovin.models;
 
 public class LinkModel {
 
-    String href;
-    String title;
+    private String href;
+    private String title;
 
     public String getHref() {
         return href;

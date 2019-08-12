@@ -1,14 +1,17 @@
 package com.weuller.sambatechtest.network.bitmovin.models.muxings;
 
+import com.weuller.sambatechtest.network.bitmovin.models.EncodingOutputModel;
+import com.weuller.sambatechtest.network.bitmovin.models.MuxingStreamModel;
+
 import java.util.List;
 
 public class PostMuxingFM4RequestModel {
 
-    Integer segmentLength;
-    String segmentNaming;
-    String initSegmentName;
-    List<MuxingStream> streams;
-    List<EncodingOutput> outputs;
+    private Integer segmentLength;
+    private String segmentNaming;
+    private String initSegmentName;
+    private List<MuxingStreamModel> streams;
+    private List<EncodingOutputModel> outputs;
 
     public PostMuxingFM4RequestModel() {
         this.segmentLength = 4;
@@ -40,98 +43,21 @@ public class PostMuxingFM4RequestModel {
         this.initSegmentName = initSegmentName;
     }
 
-    public List<MuxingStream> getStreams() {
+    public List<MuxingStreamModel> getStreams() {
         return streams;
     }
 
-    public void setStreams(List<MuxingStream> streams) {
+    public void setStreams(List<MuxingStreamModel> streams) {
         this.streams = streams;
     }
 
-    public List<EncodingOutput> getOutputs() {
+    public List<EncodingOutputModel> getOutputs() {
         return outputs;
     }
 
-    public void setOutputs(List<EncodingOutput> outputs) {
+    public void setOutputs(List<EncodingOutputModel> outputs) {
         this.outputs = outputs;
     }
 
-    public static class MuxingStream {
-        String streamId;
 
-        public MuxingStream(String streamId) {
-            this.streamId = streamId;
-        }
-
-        public MuxingStream() {
-        }
-
-        public String getStreamId() {
-            return streamId;
-        }
-
-        public void setStreamId(String streamId) {
-            this.streamId = streamId;
-        }
-    }
-
-    public static class EncodingOutput {
-        String outputId;
-        String outputPath;
-        List<AclEntry> acl;
-
-        public EncodingOutput(String outputId, String outputPath, List<AclEntry> acl) {
-            this.outputId = outputId;
-            this.outputPath = outputPath;
-            this.acl = acl;
-        }
-
-        public EncodingOutput() {
-        }
-
-        public String getOutputId() {
-            return outputId;
-        }
-
-        public void setOutputId(String outputId) {
-            this.outputId = outputId;
-        }
-
-        public String getOutputPath() {
-            return outputPath;
-        }
-
-        public void setOutputPath(String outputPath) {
-            this.outputPath = outputPath;
-        }
-
-        public List<AclEntry> getAcl() {
-            return acl;
-        }
-
-        public void setAcl(List<AclEntry> acl) {
-            this.acl = acl;
-        }
-
-        public static class AclEntry {
-
-            String permission;
-
-            public AclEntry(String permission) {
-                this.permission = permission;
-            }
-
-            public AclEntry() {
-                this.permission = "PUBLIC_READ";
-            }
-
-            public String getPermission() {
-                return permission;
-            }
-
-            public void setPermission(String permission) {
-                this.permission = permission;
-            }
-        }
-    }
 }

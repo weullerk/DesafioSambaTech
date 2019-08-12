@@ -2,9 +2,9 @@ package com.weuller.sambatechtest.network.bitmovin.models;
 
 public class ResponseErrorModel {
 
-    String requestId;
-    String status;
-    ResponseErrorDataModel data;
+    private String requestId;
+    private String status;
+    private ResponseErrorDataModel data;
 
     public String getRequestId() {
         return requestId;

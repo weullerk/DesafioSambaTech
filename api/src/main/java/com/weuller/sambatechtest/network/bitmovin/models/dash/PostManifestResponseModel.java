@@ -1,7 +1,6 @@
-package com.weuller.sambatechtest.network.bitmovin.models.encoding;
+package com.weuller.sambatechtest.network.bitmovin.models.dash;
 
-public class PostEncodingResponseModel {
-
+public class PostManifestResponseModel {
     private String requestId;
     private String status;
     private ResultWrapper data;
@@ -31,22 +30,18 @@ public class PostEncodingResponseModel {
     }
 
     public static class ResultWrapper {
-        private Encoding result;
+        private DashManifest result;
 
-        public Encoding getResult() {
+        public DashManifest getResult() {
             return result;
         }
 
-        public void setResult(Encoding result) {
+        public void setResult(DashManifest result) {
             this.result = result;
         }
 
-        public static class Encoding {
+        public static class DashManifest {
             private String id;
-            private String name;
-            private String encoderVersion;
-
-            public Encoding() {}
 
             public String getId() {
                 return id;
@@ -54,22 +49,6 @@ public class PostEncodingResponseModel {
 
             public void setId(String id) {
                 this.id = id;
-            }
-
-            public String getName() {
-                return name;
-            }
-
-            public void setName(String name) {
-                this.name = name;
-            }
-
-            public String getEncoderVersion() {
-                return encoderVersion;
-            }
-
-            public void setEncoderVersion(String encoderVersion) {
-                this.encoderVersion = encoderVersion;
             }
         }
     }

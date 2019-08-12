@@ -4,8 +4,8 @@ import java.util.List;
 
 public class PostStreamsRequestModel {
 
-    String codecConfigId;
-    List<StreamInput> inputStreams;
+    private String codecConfigId;
+    private List<StreamInput> inputStreams;
 
     public PostStreamsRequestModel(String codecConfigId, List<StreamInput> inputStreams) {
         this.codecConfigId = codecConfigId;
@@ -30,9 +30,9 @@ public class PostStreamsRequestModel {
 
     public static class StreamInput {
 
-        String inputId;
-        String inputPath;
-        String selectionMode;
+        private String inputId;
+        private String inputPath;
+        private String selectionMode;
 
         public StreamInput(String inputId, String inputPath, String selectionMode) {
             this.inputId = inputId;

@@ -4,9 +4,9 @@ import java.util.List;
 
 public class PostStreamsResponseModel {
 
-    String requestId;
-    String status;
-    ResultWrapper data;
+    private String requestId;
+    private String status;
+    private ResultWrapper data;
 
     public String getRequestId() {
         return requestId;
@@ -34,7 +34,7 @@ public class PostStreamsResponseModel {
 
     public static class ResultWrapper {
 
-        Stream result;
+        private Stream result;
 
         public Stream getResult() {
             return result;
@@ -46,9 +46,9 @@ public class PostStreamsResponseModel {
 
         public static class Stream {
 
-            String id;
-            String codecConfigId;
-            List<StreamInput> inputStreams;
+            private String id;
+            private String codecConfigId;
+            private List<StreamInput> inputStreams;
 
             public Stream(String id, String codecConfigId, List<StreamInput> inputStreams) {
                 this.id = id;
@@ -84,9 +84,9 @@ public class PostStreamsResponseModel {
 
             public static class StreamInput {
 
-                String inputId;
-                String inputPath;
-                String selectionMode;
+                private String inputId;
+                private String inputPath;
+                private String selectionMode;
 
                 public StreamInput(String inputId, String inputPath, String selectionMode) {
                     this.inputId = inputId;

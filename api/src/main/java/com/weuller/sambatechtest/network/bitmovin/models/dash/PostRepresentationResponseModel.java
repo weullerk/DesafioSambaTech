@@ -1,12 +1,12 @@
-package com.weuller.sambatechtest.network.bitmovin.models.muxings;
+package com.weuller.sambatechtest.network.bitmovin.models.dash;
 
+import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
 
-
-public class PostMuxingFM4ResponseModel {
+public class PostRepresentationResponseModel {
 
     private String requestId;
     private String status;
-    private ResultWrapper data;
+    private PostMuxingFM4ResponseModel.ResultWrapper data;
 
     public String getRequestId() {
         return requestId;
@@ -24,26 +24,26 @@ public class PostMuxingFM4ResponseModel {
         this.status = status;
     }
 
-    public ResultWrapper getData() {
+    public PostMuxingFM4ResponseModel.ResultWrapper getData() {
         return data;
     }
 
-    public void setData(ResultWrapper data) {
+    public void setData(PostMuxingFM4ResponseModel.ResultWrapper data) {
         this.data = data;
     }
 
     public static class ResultWrapper {
-        private Fmp4Muxing result;
+        private DashFmp4Representation result;
 
-        public Fmp4Muxing getResult() {
+        public DashFmp4Representation getResult() {
             return result;
         }
 
-        public void setResult(Fmp4Muxing result) {
+        public void setResult(DashFmp4Representation result) {
             this.result = result;
         }
 
-        public static class Fmp4Muxing {
+        public static class DashFmp4Representation {
             String id;
 
             public String getId() {

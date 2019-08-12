@@ -4,13 +4,13 @@ import java.util.List;
 
 public class MessageModel {
 
-    String id;
-    String type;
-    String text;
-    String field;
-    List<LinkModel> links;
-    FieldMoreModel more;
-    String date;
+    private String id;
+    private String type;
+    private String text;
+    private String field;
+    private List<LinkModel> links;
+    private FieldMoreModel more;
+    private String date;
 
     public String getId() {
         return id;

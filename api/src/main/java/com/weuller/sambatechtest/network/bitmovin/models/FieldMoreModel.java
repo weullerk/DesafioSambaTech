@@ -2,7 +2,7 @@ package com.weuller.sambatechtest.network.bitmovin.models;
 
 public class FieldMoreModel {
 
-    String description;
+    private String description;
 
     public String getDescription() {
         return description;

@@ -2,8 +2,8 @@ package com.weuller.sambatechtest.network.bitmovin.models.encoding;
 
 public class PostEncodingRequestModel {
 
-    String name;
-    String encoderVersion;
+    private String name;
+    private String encoderVersion;
 
     public PostEncodingRequestModel(String name, String encoderVersion) {
         this.name = name;
