@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weuller.sambatechtest.SpringTestConfig;
 import com.weuller.sambatechtest.network.bitmovin.BitmovinApi;
 import com.weuller.sambatechtest.network.bitmovin.models.dash.PostManifestResponseModel;
+import com.weuller.sambatechtest.network.bitmovin.models.dash.PostPeriodResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
@@ -163,8 +164,8 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(
                         withStatus(HttpStatus.CREATED)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .body(mapper.writeValueAsString(response))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(response))
                 );
 
         PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
@@ -204,8 +205,8 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(
                         withStatus(HttpStatus.CREATED)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .body(mapper.writeValueAsString(response))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(response))
                 );
 
         PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
@@ -244,8 +245,8 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(
                         withStatus(HttpStatus.BAD_REQUEST)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .body(mapper.writeValueAsString(response))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(response))
                 );
 
         bitmovinApi.createStreams(encodingId, inputPath, codecConfigId);
@@ -274,8 +275,8 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(
                         withStatus(HttpStatus.CREATED)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .body(mapper.writeValueAsString(response))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(response))
                 );
 
         PostMuxingFM4ResponseModel fm4Response = bitmovinApi.createMuxingFM4(encodingId, streamId, outputPath);
@@ -306,14 +307,45 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(
                         withStatus(HttpStatus.CREATED)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .body(mapper.writeValueAsString(response))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(response))
                 );
 
         PostManifestResponseModel manifestResponse = bitmovinApi.createManifest(outputId, outputPath);
 
         Assert.assertNotNull(manifestResponse);
         Assert.assertNotNull(manifestResponse.getData().getResult().getId());
+    }
+
+    @Test
+    public void Given_MockingByMockRestServiceServer_When_CreatePeriodIsCalledAndResponseStatusIsSuccess_Then_ManifestWillBeCreated() throws Exception {
+        String manifestId = "55354be6-0237-42bb-ae85-a2d4ef1ed19e";
+
+        PostPeriodResponseModel.ResultWrapper.Period period = new PostPeriodResponseModel.ResultWrapper.Period();
+        PostPeriodResponseModel.ResultWrapper resultWrapper = new PostPeriodResponseModel.ResultWrapper();
+        PostPeriodResponseModel response = new PostPeriodResponseModel();
+
+        period.setId("45ef21d2-1f62-4004-9166-6d5e248270f6");
+
+        resultWrapper.setResult(period);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_SUCCESS);
+
+        String url = String.format(BitmovinApi.BASE_URL + ENDPOINT_CREATE_PERIOD, manifestId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(response))
+                );
+
+        PostPeriodResponseModel periodResponse = bitmovinApi.createPeriod(manifestId);
+
+        Assert.assertNotNull(periodResponse);
+        Assert.assertNotNull(periodResponse.getData().getResult().getId());
     }
 
 }

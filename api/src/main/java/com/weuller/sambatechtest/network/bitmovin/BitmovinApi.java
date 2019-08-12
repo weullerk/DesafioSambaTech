@@ -146,10 +146,10 @@ public class BitmovinApi {
         }
     }
 
-    public PostPeriodResponseModel createPeriod() {
+    public PostPeriodResponseModel createPeriod(String manifestId) {
         HttpHeaders header = getHeaders();
 
-        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_PERIOD;
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_PERIOD, manifestId);
 
         HttpEntity<Object> request = new HttpEntity<>(new Object(), header);
 
