@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weuller.sambatechtest.SpringTestConfig;
 import com.weuller.sambatechtest.network.bitmovin.BitmovinApi;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
+import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
+import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsResponseModel;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.ArrayList;
 
 import static com.weuller.sambatechtest.network.bitmovin.BitmovinApi.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
@@ -125,6 +128,125 @@ public class BitmovinApiMockRestServiceServerUnitTest {
                 );
 
         bitmovinApi.createEncoding();
+    }
+
+    @Test
+    public void Given_MockingByMockRestServiceServer_When_CreateStreamsIsCalledAndResponseStatusIsSuccess_Then_StreamsWillBeCreated() throws Exception {
+        String encodingId = "f3177c2e-0000-4ba6-bd20-1dee353d8a72";
+        String inputId = "47c3e8a3-ab76-46f5-8b07-cd2e2b0c3728";
+        String codecConfigId = "d09c1a8a-4c56-4392-94d8-81712118aae0";
+        String inputPath = "/videos/movie1.mp4";
+
+
+        PostStreamsResponseModel.ResultWrapper.Stream.StreamInput streamInput = new PostStreamsResponseModel.ResultWrapper.Stream.StreamInput(inputId, inputPath, "AUTO");
+        ArrayList<PostStreamsResponseModel.ResultWrapper.Stream.StreamInput> streamInputArrayList = new ArrayList<>();
+        streamInputArrayList.add(streamInput);
+
+        PostStreamsResponseModel.ResultWrapper.Stream stream = new PostStreamsResponseModel.ResultWrapper.Stream();
+        PostStreamsResponseModel.ResultWrapper resultWrapper = new PostStreamsResponseModel.ResultWrapper();
+        PostStreamsResponseModel response = new PostStreamsResponseModel();
+
+        stream.setId("6d84e126-d10c-4e52-bbfb-bd4c92bc8333");
+        stream.setCodecConfigId(codecConfigId);
+        stream.setInputStreams(streamInputArrayList);
+
+        resultWrapper.setResult(stream);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_SUCCESS);
+
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_STREAMS, encodingId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputId, inputPath, codecConfigId);
+
+        Assert.assertNotNull(streamsResponse);
+        Assert.assertNotNull(streamsResponse.getData().getResult().getId());
+    }
+
+    @Test
+    public void Given_MockingRequestAndResult_When_CreateStreamsIsCalledAndRequestIsOkAndResponseStatusIsError_Then_StreamsWillNotBeCreated() throws Exception {
+        String encodingId = "f3177c2e-0000-4ba6-bd20-1dee353d8a72";
+        String inputId = "47c3e8a3-ab76-46f5-8b07-cd2e2b0c3728";
+        String codecConfigId = "d09c1a8a-4c56-4392-94d8-81712118aae0";
+        String inputPath = "/videos/movie1.mp4";
+
+
+        PostStreamsResponseModel.ResultWrapper.Stream.StreamInput streamInput = new PostStreamsResponseModel.ResultWrapper.Stream.StreamInput(inputId, inputPath, "AUTO");
+        ArrayList<PostStreamsResponseModel.ResultWrapper.Stream.StreamInput> streamInputArrayList = new ArrayList<>();
+        streamInputArrayList.add(streamInput);
+
+        PostStreamsResponseModel.ResultWrapper.Stream stream = new PostStreamsResponseModel.ResultWrapper.Stream();
+        PostStreamsResponseModel.ResultWrapper resultWrapper = new PostStreamsResponseModel.ResultWrapper();
+        PostStreamsResponseModel response = new PostStreamsResponseModel();
+
+        stream.setId("");
+        stream.setCodecConfigId(codecConfigId);
+        stream.setInputStreams(streamInputArrayList);
+
+        resultWrapper.setResult(stream);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_ERROR);
+
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_STREAMS, encodingId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        PostStreamsResponseModel streamsResponse = bitmovinApi.createStreams(encodingId, inputId, inputPath, codecConfigId);
+
+        Assert.assertNull(streamsResponse);
+    }
+
+    @Test(expected = HttpClientErrorException.class)
+    public void Given_MockingRequestAndResult_When_CreateStreamsIsCalledAndRequestIsErrorAndResponseStatusIsError_Then_ExceptionIsThrown() throws Exception {
+        String encodingId = "f3177c2e-0000-4ba6-bd20-1dee353d8a72";
+        String inputId = "47c3e8a3-ab76-46f5-8b07-cd2e2b0c3728";
+        String codecConfigId = "d09c1a8a-4c56-4392-94d8-81712118aae0";
+        String inputPath = "/videos/movie1.mp4";
+
+
+        PostStreamsResponseModel.ResultWrapper.Stream.StreamInput streamInput = new PostStreamsResponseModel.ResultWrapper.Stream.StreamInput(inputId, inputPath, "AUTO");
+        ArrayList<PostStreamsResponseModel.ResultWrapper.Stream.StreamInput> streamInputArrayList = new ArrayList<>();
+        streamInputArrayList.add(streamInput);
+
+        PostStreamsResponseModel.ResultWrapper.Stream stream = new PostStreamsResponseModel.ResultWrapper.Stream();
+        PostStreamsResponseModel.ResultWrapper resultWrapper = new PostStreamsResponseModel.ResultWrapper();
+        PostStreamsResponseModel response = new PostStreamsResponseModel();
+
+        stream.setId("");
+        stream.setCodecConfigId(codecConfigId);
+        stream.setInputStreams(streamInputArrayList);
+
+        resultWrapper.setResult(stream);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_ERROR);
+
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_STREAMS, encodingId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.BAD_REQUEST)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        bitmovinApi.createStreams(encodingId, inputId, inputPath, codecConfigId);
     }
 
 }

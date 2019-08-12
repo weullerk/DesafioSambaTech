@@ -34,6 +34,12 @@ public class PostStreamsRequestModel {
         String inputPath;
         String selectionMode;
 
+        public StreamInput(String inputId, String inputPath, String selectionMode) {
+            this.inputId = inputId;
+            this.inputPath = inputPath;
+            this.selectionMode = selectionMode;
+        }
+
         public String getInputId() {
             return inputId;
         }

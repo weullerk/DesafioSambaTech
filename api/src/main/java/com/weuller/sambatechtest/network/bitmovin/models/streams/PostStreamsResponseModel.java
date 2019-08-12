@@ -2,7 +2,7 @@ package com.weuller.sambatechtest.network.bitmovin.models.streams;
 
 import java.util.List;
 
-public class PostStreamResponseModel {
+public class PostStreamsResponseModel {
 
     String requestId;
     String status;
@@ -50,6 +50,22 @@ public class PostStreamResponseModel {
             String codecConfigId;
             List<StreamInput> inputStreams;
 
+            public Stream(String id, String codecConfigId, List<StreamInput> inputStreams) {
+                this.id = id;
+                this.codecConfigId = codecConfigId;
+                this.inputStreams = inputStreams;
+            }
+
+            public Stream() {}
+
+            public String getId() {
+                return id;
+            }
+
+            public void setId(String id) {
+                this.id = id;
+            }
+
             public String getCodecConfigId() {
                 return codecConfigId;
             }
@@ -71,6 +87,14 @@ public class PostStreamResponseModel {
                 String inputId;
                 String inputPath;
                 String selectionMode;
+
+                public StreamInput(String inputId, String inputPath, String selectionMode) {
+                    this.inputId = inputId;
+                    this.inputPath = inputPath;
+                    this.selectionMode = selectionMode;
+                }
+
+                public StreamInput() {}
 
                 public String getInputId() {
                     return inputId;
