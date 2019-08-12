@@ -3,9 +3,7 @@ package com.weuller.sambatechtest.network;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weuller.sambatechtest.SpringTestConfig;
 import com.weuller.sambatechtest.network.bitmovin.BitmovinApi;
-import com.weuller.sambatechtest.network.bitmovin.models.dash.PostAudioAdaptationSetResponseModel;
-import com.weuller.sambatechtest.network.bitmovin.models.dash.PostManifestResponseModel;
-import com.weuller.sambatechtest.network.bitmovin.models.dash.PostPeriodResponseModel;
+import com.weuller.sambatechtest.network.bitmovin.models.dash.*;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
@@ -379,6 +377,74 @@ public class BitmovinApiMockRestServiceServerUnitTest {
 
         Assert.assertNotNull(audioAdaptationSetResponse);
         Assert.assertNotNull(audioAdaptationSetResponse.getData().getResult().getId());
+    }
+
+    @Test
+    public void Given_MockingByMockRestServiceServer_When_CreateVideoAdaptationSetIsCalledAndResponseStatusIsSuccess_Then_VideoAdaptationSetWillBeCreated() throws Exception {
+        String manifestId = "45ef21d2-1f62-4004-9166-6d5e248270f6";
+        String periodId = "cb90b80c-8867-4e3b-8479-174aa2843f62";
+
+        PostVideoAdaptationSetResponseModel.ResultWrapper.VideoAdaptationSet videoAdaptationSet = new PostVideoAdaptationSetResponseModel.ResultWrapper.VideoAdaptationSet();
+        PostVideoAdaptationSetResponseModel.ResultWrapper resultWrapper = new PostVideoAdaptationSetResponseModel.ResultWrapper();
+        PostVideoAdaptationSetResponseModel response = new PostVideoAdaptationSetResponseModel();
+
+        videoAdaptationSet.setId("cb90b80c-8867-4e3b-8479-174aa2843f62");
+
+        resultWrapper.setResult(videoAdaptationSet);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_SUCCESS);
+
+        String url = String.format(BitmovinApi.BASE_URL + ENDPOINT_CREATE_VIDEO_ADAPTATION_SET, manifestId, periodId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        PostVideoAdaptationSetResponseModel videoAdaptationSetResponse = bitmovinApi.createVideoAdaptationSet(manifestId, periodId);
+
+        Assert.assertNotNull(videoAdaptationSetResponse);
+        Assert.assertNotNull(videoAdaptationSetResponse.getData().getResult().getId());
+    }
+
+    @Test
+    public void Given_MockingByMockRestServiceServer_When_CreatRepresentationIsCalledAndResponseStatusIsSuccess_Then_RepresentationWillBeCreated() throws Exception {
+        String manifestId = "45ef21d2-1f62-4004-9166-6d5e248270f6";
+        String periodId = "cb90b80c-8867-4e3b-8479-174aa2843f62";
+        String adaptationSetId = "ae1c49de-9b7a-4b6f-9d0b-401d7d64e835";
+        String encodingId = "f3177c2e-0000-4ba6-bd20-1dee353d8a72";
+        String muxingId = "cb90b80c-8867-4e3b-8479-174aa2843f62";
+        String segmentPath = "custom/path/h264/384_240000/fmp4";
+
+        PostRepresentationResponseModel.ResultWrapper.DashFmp4Representation dashFmp4Representation = new PostRepresentationResponseModel.ResultWrapper.DashFmp4Representation();
+        PostRepresentationResponseModel.ResultWrapper resultWrapper = new PostRepresentationResponseModel.ResultWrapper();
+        PostRepresentationResponseModel response = new PostRepresentationResponseModel();
+
+        dashFmp4Representation.setId("cb90b80c-8867-4e3b-8479-174aa2843f62");
+
+        resultWrapper.setResult(dashFmp4Representation);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_SUCCESS);
+
+        String url = String.format(BitmovinApi.BASE_URL + ENDPOINT_CREATE_REPRESENTATION, manifestId, periodId, adaptationSetId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        PostRepresentationResponseModel representationResponse = bitmovinApi.createRepresentation(manifestId, periodId, adaptationSetId, encodingId, muxingId, segmentPath);
+
+        Assert.assertNotNull(representationResponse);
+        Assert.assertNotNull(representationResponse.getData().getResult().getId());
     }
 
 }
