@@ -199,7 +199,7 @@ public class BitmovinApi {
         PostRepresentationRequestModel body = new PostRepresentationRequestModel("TEMPLATE", encodingId, muxingId, segmentPath);
         HttpHeaders header = getHeaders();
 
-        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_AUDIO_ADAPTATION_SET;
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_REPRESENTATION, manifestId, periodId, adaptationSetId);
 
         HttpEntity<PostRepresentationRequestModel> request = new HttpEntity<>(body, header);
 
