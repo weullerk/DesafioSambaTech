@@ -1,11 +1,20 @@
-package com.weuller.sambatechtest.network.bitmovin.models;
+package com.weuller.sambatechtest.network.bitmovin.models.streams;
 
 import java.util.List;
 
 public class PostStreamResponseModel {
 
+    String requestId;
     String status;
     ResultWrapper data;
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
 
     public String getStatus() {
         return status;

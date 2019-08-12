@@ -1,4 +1,4 @@
-package com.weuller.sambatechtest.network.bitmovin.models;
+package com.weuller.sambatechtest.network.bitmovin.models.streams;
 
 import java.util.List;
 
@@ -27,6 +27,7 @@ public class PostStreamsRequestModel {
     public void setInputStreams(List<StreamInput> inputStreams) {
         this.inputStreams = inputStreams;
     }
+
     public static class StreamInput {
 
         String inputId;

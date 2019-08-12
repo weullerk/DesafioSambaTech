@@ -1,9 +1,18 @@
-package com.weuller.sambatechtest.network.bitmovin.models;
+package com.weuller.sambatechtest.network.bitmovin.models.encoding;
 
 public class PostEncodingResponseModel {
 
+    String requestId;
     String status;
     ResultWrapper data;
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
 
     public String getStatus() {
         return status;
