@@ -123,13 +123,13 @@ public class BitmovinApi {
         }
     }
 
-    public PostManifestResponseModel createManifestDash(String outputId, String outputPath) {
+    public PostManifestResponseModel createManifest(String outputId, String outputPath) {
         ArrayList<AclEntryModel> aclEntries = new ArrayList<>();
         aclEntries.add(new AclEntryModel());
 
-        EncodingOutputModel encodingOutput = new EncodingOutputModel(OUTPUT_ID, outputPath, aclEntries);
+        EncodingOutputModel encodingOutput = new EncodingOutputModel(outputId, outputPath, aclEntries);
 
-        PostManifestRequestModel body = new PostManifestRequestModel("Manifest", "dash.mpd", encodingOutput);
+        PostManifestRequestModel body = new PostManifestRequestModel("Manifest", "manifest.mpd", encodingOutput);
 
         HttpHeaders header = getHeaders();
 

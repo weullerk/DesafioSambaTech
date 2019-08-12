@@ -3,6 +3,7 @@ package com.weuller.sambatechtest.network;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weuller.sambatechtest.SpringTestConfig;
 import com.weuller.sambatechtest.network.bitmovin.BitmovinApi;
+import com.weuller.sambatechtest.network.bitmovin.models.dash.PostManifestResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
@@ -261,7 +262,7 @@ public class BitmovinApiMockRestServiceServerUnitTest {
         PostMuxingFM4ResponseModel response = new PostMuxingFM4ResponseModel();
 
         fmp4Muxing.setId("cb90b80c-8867-4e3b-8479-174aa2843f62");
-        
+
         resultWrapper.setResult(fmp4Muxing);
 
         response.setData(resultWrapper);
@@ -281,6 +282,38 @@ public class BitmovinApiMockRestServiceServerUnitTest {
 
         Assert.assertNotNull(fm4Response);
         Assert.assertNotNull(fm4Response.getData().getResult().getId());
+    }
+
+    @Test
+    public void Given_MockingByMockRestServiceServer_When_CreateManifestIsCalledAndResponseStatusIsSuccess_Then_ManifestWillBeCreated() throws Exception {
+        String outputId = "55354be6-0237-42bb-ae85-a2d4ef1ed19e";
+        String outputPath = "/encodings/movies/movie-1/video_720/";
+
+        PostManifestResponseModel.ResultWrapper.DashManifest dashManifest = new PostManifestResponseModel.ResultWrapper.DashManifest();
+        PostManifestResponseModel.ResultWrapper resultWrapper = new PostManifestResponseModel.ResultWrapper();
+        PostManifestResponseModel response = new PostManifestResponseModel();
+
+        dashManifest.setId("cb90b80c-8867-4e3b-8479-174aa2843f62");
+
+        resultWrapper.setResult(dashManifest);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_SUCCESS);
+
+        String url = BitmovinApi.BASE_URL + ENDPOINT_CREATE_MANIFEST;
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        PostManifestResponseModel manifestResponse = bitmovinApi.createManifest(outputId, outputPath);
+
+        Assert.assertNotNull(manifestResponse);
+        Assert.assertNotNull(manifestResponse.getData().getResult().getId());
     }
 
 }
