@@ -3,6 +3,7 @@ package com.weuller.sambatechtest.network;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weuller.sambatechtest.SpringTestConfig;
 import com.weuller.sambatechtest.network.bitmovin.BitmovinApi;
+import com.weuller.sambatechtest.network.bitmovin.models.dash.PostAudioAdaptationSetResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.dash.PostManifestResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.dash.PostPeriodResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
@@ -318,14 +319,14 @@ public class BitmovinApiMockRestServiceServerUnitTest {
     }
 
     @Test
-    public void Given_MockingByMockRestServiceServer_When_CreatePeriodIsCalledAndResponseStatusIsSuccess_Then_ManifestWillBeCreated() throws Exception {
-        String manifestId = "55354be6-0237-42bb-ae85-a2d4ef1ed19e";
+    public void Given_MockingByMockRestServiceServer_When_CreatePeriodIsCalledAndResponseStatusIsSuccess_Then_PeriodWillBeCreated() throws Exception {
+        String manifestId = "45ef21d2-1f62-4004-9166-6d5e248270f6";
 
         PostPeriodResponseModel.ResultWrapper.Period period = new PostPeriodResponseModel.ResultWrapper.Period();
         PostPeriodResponseModel.ResultWrapper resultWrapper = new PostPeriodResponseModel.ResultWrapper();
         PostPeriodResponseModel response = new PostPeriodResponseModel();
 
-        period.setId("45ef21d2-1f62-4004-9166-6d5e248270f6");
+        period.setId("cb90b80c-8867-4e3b-8479-174aa2843f62");
 
         resultWrapper.setResult(period);
 
@@ -346,6 +347,38 @@ public class BitmovinApiMockRestServiceServerUnitTest {
 
         Assert.assertNotNull(periodResponse);
         Assert.assertNotNull(periodResponse.getData().getResult().getId());
+    }
+
+    @Test
+    public void Given_MockingByMockRestServiceServer_When_CreateAudioAdaptationSetIsCalledAndResponseStatusIsSuccess_Then_AudioAdaptationSetWillBeCreated() throws Exception {
+        String manifestId = "45ef21d2-1f62-4004-9166-6d5e248270f6";
+        String periodId = "cb90b80c-8867-4e3b-8479-174aa2843f62";
+
+        PostAudioAdaptationSetResponseModel.ResultWrapper.AudioAdaptationSet audioAdaptationSet = new PostAudioAdaptationSetResponseModel.ResultWrapper.AudioAdaptationSet();
+        PostAudioAdaptationSetResponseModel.ResultWrapper resultWrapper = new PostAudioAdaptationSetResponseModel.ResultWrapper();
+        PostAudioAdaptationSetResponseModel response = new PostAudioAdaptationSetResponseModel();
+
+        audioAdaptationSet.setId("cb90b80c-8867-4e3b-8479-174aa2843f62");
+
+        resultWrapper.setResult(audioAdaptationSet);
+
+        response.setData(resultWrapper);
+        response.setStatus(RESPONSE_STATUS_SUCCESS);
+
+        String url = String.format(BitmovinApi.BASE_URL + ENDPOINT_CREATE_AUDIO_ADAPTATION_SET, manifestId, periodId);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(new URI(url)))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(mapper.writeValueAsString(response))
+                );
+
+        PostAudioAdaptationSetResponseModel audioAdaptationSetResponse = bitmovinApi.createAudioAdaptationSet(manifestId, periodId);
+
+        Assert.assertNotNull(audioAdaptationSetResponse);
+        Assert.assertNotNull(audioAdaptationSetResponse.getData().getResult().getId());
     }
 
 }

@@ -151,7 +151,7 @@ public class BitmovinApi {
 
         String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_PERIOD, manifestId);
 
-        HttpEntity<Object> request = new HttpEntity<>(new Object(), header);
+        HttpEntity request = new HttpEntity<>(header);
 
         ResponseEntity<PostPeriodResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostPeriodResponseModel.class);
 
@@ -166,7 +166,7 @@ public class BitmovinApi {
         PostAudioAdaptationSetRequestModel body = new PostAudioAdaptationSetRequestModel("pt");
         HttpHeaders header = getHeaders();
 
-        String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_AUDIO_ADAPTATION_SET;
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_AUDIO_ADAPTATION_SET, manifestId, periodId);
 
         HttpEntity<PostAudioAdaptationSetRequestModel> request = new HttpEntity<>(body, header);
 
@@ -184,7 +184,7 @@ public class BitmovinApi {
 
         String url = BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_VIDEO_ADAPTATION_SET;
 
-        HttpEntity<Object> request = new HttpEntity<>(new Object(), header);
+        HttpEntity request = new HttpEntity(header);
 
         ResponseEntity<PostVideoAdaptationSetResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostVideoAdaptationSetResponseModel.class);
 
