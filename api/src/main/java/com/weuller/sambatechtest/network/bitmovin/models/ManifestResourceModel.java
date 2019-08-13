@@ -2,7 +2,7 @@ package com.weuller.sambatechtest.network.bitmovin.models;
 
 public class ManifestResourceModel {
 
-    String manifestId;
+    private String manifestId;
 
     public ManifestResourceModel(String manifestId) {
         this.manifestId = manifestId;

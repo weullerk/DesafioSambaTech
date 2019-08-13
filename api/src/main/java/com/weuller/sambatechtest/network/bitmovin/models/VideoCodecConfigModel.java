@@ -44,11 +44,11 @@ public class VideoCodecConfigModel {
 
         public static class Result {
 
-            String id;
-            String name;
-            Integer bitrate;
-            Integer width;
-            String profile;
+            private String id;
+            private String name;
+            private Integer bitrate;
+            private Integer width;
+            private String profile;
 
             public String getId() {
                 return id;

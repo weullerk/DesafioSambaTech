@@ -44,9 +44,9 @@ public class AudioCodecConfigModel {
 
         public static class Result {
 
-            String id;
-            String name;
-            Integer bitrate;
+            private String id;
+            private String name;
+            private Integer bitrate;
 
             public String getId() {
                 return id;

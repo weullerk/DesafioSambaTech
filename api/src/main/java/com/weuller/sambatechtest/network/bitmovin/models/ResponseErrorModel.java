@@ -1,5 +1,7 @@
 package com.weuller.sambatechtest.network.bitmovin.models;
 
+import java.util.List;
+
 public class ResponseErrorModel {
 
     private String requestId;
@@ -28,5 +30,14 @@ public class ResponseErrorModel {
 
     public void setData(ResponseErrorDataModel data) {
         this.data = data;
+    }
+
+    public class ResponseErrorDataModel {
+        private String description;
+        private Integer code;
+        private String message;
+        private String developerMessage;
+        private List<LinkModel> links;
+        private List<MessageModel> details;
     }
 }
