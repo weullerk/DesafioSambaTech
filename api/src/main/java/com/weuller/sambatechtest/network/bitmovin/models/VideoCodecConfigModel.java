@@ -1,6 +1,6 @@
 package com.weuller.sambatechtest.network.bitmovin.models;
 
-public class AudioCodecConfigModel {
+public class VideoCodecConfigModel {
 
     private String requestId;
     private String status;
@@ -47,6 +47,8 @@ public class AudioCodecConfigModel {
             String id;
             String name;
             Integer bitrate;
+            Integer width;
+            String profile;
 
             public String getId() {
                 return id;
@@ -71,6 +73,24 @@ public class AudioCodecConfigModel {
             public void setBitrate(Integer bitrate) {
                 this.bitrate = bitrate;
             }
+
+            public Integer getWidth() {
+                return width;
+            }
+
+            public void setWidth(Integer width) {
+                this.width = width;
+            }
+
+            public String getProfile() {
+                return profile;
+            }
+
+            public void setProfile(String profile) {
+                this.profile = profile;
+            }
         }
     }
 }
+
+

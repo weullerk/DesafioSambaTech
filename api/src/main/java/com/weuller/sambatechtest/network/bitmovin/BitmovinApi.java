@@ -1,9 +1,6 @@
 package com.weuller.sambatechtest.network.bitmovin;
 
-import com.weuller.sambatechtest.network.bitmovin.models.AclEntryModel;
-import com.weuller.sambatechtest.network.bitmovin.models.EncodingOutputModel;
-import com.weuller.sambatechtest.network.bitmovin.models.ManifestResourceModel;
-import com.weuller.sambatechtest.network.bitmovin.models.MuxingStreamModel;
+import com.weuller.sambatechtest.network.bitmovin.models.*;
 import com.weuller.sambatechtest.network.bitmovin.models.dash.*;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingRequestModel;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
@@ -228,6 +225,34 @@ public class BitmovinApi {
             return response.getBody().getData().getResult().getId();
         } else {
             throw new InvalidStateException("Falha ao criar representation!");
+        }
+    }
+
+    public AudioCodecConfigModel.ResultWrapper.Result getAudioCodecConfig(String codecConfigId) {
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_GET_CODEC_AUDIO, codecConfigId);
+        HttpHeaders header = getHeaders();
+
+        HttpEntity request = new HttpEntity(header);
+        ResponseEntity<AudioCodecConfigModel> response = restTemplate.exchange(url, HttpMethod.GET, request, AudioCodecConfigModel.class);
+
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+            return response.getBody().getData().getResult();
+        } else {
+            throw new InvalidStateException("Falha ao buscar codec de audio!");
+        }
+    }
+
+    public VideoCodecConfigModel.ResultWrapper.Result getVideoCodecConfig(String codecConfigId) {
+        String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_GET_CODEC_VIDEO, codecConfigId);
+        HttpHeaders header = getHeaders();
+
+        HttpEntity request = new HttpEntity(header);
+        ResponseEntity<VideoCodecConfigModel> response = restTemplate.exchange(url, HttpMethod.GET, request, VideoCodecConfigModel.class);
+
+        if (response.getStatusCode() == HttpStatus.OK && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+            return response.getBody().getData().getResult();
+        } else {
+            throw new InvalidStateException("Falha ao buscar codec de video!");
         }
     }
 
