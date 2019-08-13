@@ -22,7 +22,7 @@ import java.util.ArrayList;
 @Service
 public class BitmovinApi {
 
-    @Value("bitmovin.api_key")
+    @Value("${bitmovin.api_key}")
     private String API_KEY;
 
     public static final String RESPONSE_STATUS_SUCCESS = "SUCCESS";
@@ -146,7 +146,7 @@ public class BitmovinApi {
 
         String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_PERIOD, manifestId);
 
-        HttpEntity request = new HttpEntity<>(header);
+        HttpEntity<String> request = new HttpEntity<String>("", header);
 
         ResponseEntity<PostPeriodResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostPeriodResponseModel.class);
 
@@ -259,6 +259,7 @@ public class BitmovinApi {
     private HttpHeaders getHeaders() {
         HttpHeaders httpHeader = new HttpHeaders();
         httpHeader.set("X-Api-Key", API_KEY);
+        httpHeader.set(HttpHeaders.CONTENT_TYPE, "application/json;charset=UTF-8");
 
         return httpHeader;
     }

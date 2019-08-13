@@ -14,18 +14,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import sun.plugin.dom.exception.InvalidStateException;
 
+import java.io.IOException;
+
 
 @Service
 public class EncodingService {
 
-    @Value("bitmovin.input_id")
+    @Value("${bitmovin.input_id}")
     private String inputId;
 
-    @Value("bitmovin.output_id")
+    @Value("${bitmovin.output_id}")
     private String outputId;
 
     @Autowired
-    BitmovinApi bitmovin;
+    private BitmovinApi bitmovin;
 
     Logger log = LoggerFactory.getLogger(EncodingService.class);
 
@@ -33,38 +35,41 @@ public class EncodingService {
 
     }
 
-    public void encode(String input, String folder, String audioCodecConfigId, String videoCodecConfig) {
-        Integer dotPosition = input.lastIndexOf(".");
-        String inputName = dotPosition == -1 ? input : input.substring(0, dotPosition);
-        input = inputName.isEmpty() ? input : inputName;
+    public String encode(String input, String folder, String audioCodecConfigId, String videoCodecConfig) {
+        try {
+            Integer dotPosition = input.lastIndexOf(".");
+            String inputName = dotPosition == -1 ? input : input.substring(0, dotPosition);
 
-        String customPath = String.format("%s/%s/%s/%s-%s", folder, videoCodecConfig, audioCodecConfigId, inputName, Long.toString(System.currentTimeMillis()));
+            String customPath = String.format("%s/%s/%s/%s-%s", folder, videoCodecConfig, audioCodecConfigId, inputName, Long.toString(System.currentTimeMillis()));
 
-        String encodingId = bitmovin.createEncoding();
-        String videoStreamId = bitmovin.createStreams(inputId, encodingId, input, videoCodecConfig);
-        String audioStreamId = bitmovin.createStreams(inputId, encodingId, input, audioCodecConfigId);
+            String encodingId = bitmovin.createEncoding();
+            String videoStreamId = bitmovin.createStreams(inputId, encodingId, input, videoCodecConfig);
+            String audioStreamId = bitmovin.createStreams(inputId, encodingId, input, audioCodecConfigId);
 
-        VideoCodecConfigModel.ResultWrapper.Result videocCodec = bitmovin.getVideoCodecConfig(videoCodecConfig);
-        AudioCodecConfigModel.ResultWrapper.Result audioCodec = bitmovin.getAudioCodecConfig(audioCodecConfigId);
+            VideoCodecConfigModel.ResultWrapper.Result videocCodec = bitmovin.getVideoCodecConfig(videoCodecConfig);
+            AudioCodecConfigModel.ResultWrapper.Result audioCodec = bitmovin.getAudioCodecConfig(audioCodecConfigId);
 
-        String videoMuxingPath = String.format("%s/%s/%s_%s/%s/", customPath, "h264", videocCodec.getWidth().toString(), videocCodec.getBitrate().toString(), "fmp4");
-        String audioMuxingPath = String.format("%s/%s/%s/", customPath, "aac", audioCodec.getBitrate().toString(), "fmp4");
+            String videoMuxingPath = String.format("%s/%s/%s_%s/%s/", customPath, "h264", videocCodec.getWidth().toString(), videocCodec.getBitrate().toString(), "fmp4");
+            String audioMuxingPath = String.format("%s/%s/%s/", customPath, "aac", audioCodec.getBitrate().toString(), "fmp4");
 
-        String videoMuxingId = bitmovin.createMuxingFM4(outputId, encodingId, videoStreamId, videoMuxingPath);
-        String audioMuxingId = bitmovin.createMuxingFM4(outputId, encodingId, audioStreamId, audioMuxingPath);
+            String videoMuxingId = bitmovin.createMuxingFM4(outputId, encodingId, videoStreamId, videoMuxingPath);
+            String audioMuxingId = bitmovin.createMuxingFM4(outputId, encodingId, audioStreamId, audioMuxingPath);
 
+            String manifestId = bitmovin.createManifest(outputId, customPath);
+            String periodId = bitmovin.createPeriod(manifestId);
 
-        String manifestId = bitmovin.createManifest(outputId, customPath);
-        String periodId = bitmovin.createPeriod(manifestId);
+            String videoAdaptationSetId = bitmovin.createVideoAdaptationSet(manifestId, periodId);
+            String audioAdaptationSetId = bitmovin.createAudioAdaptationSet(manifestId, periodId);
 
-        String videoAdaptationSetId = bitmovin.createVideoAdaptationSet(manifestId, periodId);
-        String audioAdaptationSetId = bitmovin.createAudioAdaptationSet(manifestId, periodId);
+            String videoSegmentPath = String.format("%s/%s/%s_%s/%s", customPath, "h264", videocCodec.getWidth().toString(), videocCodec.getBitrate().toString(), "fmp4");
+            String audioSegmentPath = String.format("%s/%s/%s/", customPath, "aac", audioCodec.getBitrate().toString(), "fmp4");
 
-        String videoSegmentPath = String.format("%s/%s/%s_%s/%s", customPath, "h264", videocCodec.getWidth().toString(), videocCodec.getBitrate().toString(), "fmp4");
-        String audioSegmentPath = String.format("%s/%s/%s/", customPath, "aac", audioCodec.getBitrate().toString(), "fmp4");
-
-        bitmovin.createRepresentation(manifestId, periodId, videoAdaptationSetId, encodingId, videoMuxingId, videoSegmentPath);
-        bitmovin.createRepresentation(manifestId, periodId, audioAdaptationSetId, encodingId, audioMuxingId, audioSegmentPath);
-        bitmovin.startEncoding(encodingId, manifestId);
+            bitmovin.createRepresentation(manifestId, periodId, videoAdaptationSetId, encodingId, videoMuxingId, videoSegmentPath);
+            bitmovin.createRepresentation(manifestId, periodId, audioAdaptationSetId, encodingId, audioMuxingId, audioSegmentPath);
+            return bitmovin.startEncoding(encodingId, manifestId);
+        } catch (Exception e) {
+            log.error("DEBUG", e);
+            return null;
+        }
     }
 }

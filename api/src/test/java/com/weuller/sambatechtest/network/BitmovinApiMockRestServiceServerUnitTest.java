@@ -1,7 +1,6 @@
 package com.weuller.sambatechtest.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.weuller.sambatechtest.SpringTestConfig;
 import com.weuller.sambatechtest.network.bitmovin.BitmovinApi;
 import com.weuller.sambatechtest.network.bitmovin.models.dash.*;
 import com.weuller.sambatechtest.network.bitmovin.models.encoding.PostEncodingResponseModel;
@@ -32,7 +31,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.*;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = SpringTestConfig.class)
 public class BitmovinApiMockRestServiceServerUnitTest {
 
     @Autowired
