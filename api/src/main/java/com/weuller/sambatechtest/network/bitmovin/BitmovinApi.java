@@ -13,13 +13,12 @@ import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4Re
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsResponseModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import sun.plugin.dom.exception.InvalidStateException;
 
 import java.util.ArrayList;
 
@@ -28,8 +27,6 @@ public class BitmovinApi {
 
     @Value("bitmovin.api_key")
     private String API_KEY;
-
-
 
     public static final String RESPONSE_STATUS_SUCCESS = "SUCCESS";
     public static final String RESPONSE_STATUS_ERROR = "ERROR";
@@ -47,16 +44,18 @@ public class BitmovinApi {
     public static final String ENDPOINT_CREATE_VIDEO_ADAPTATION_SET = "/encoding/manifests/dash/%s/periods/%s/adaptationsets/video";
     public static final String ENDPOINT_CREATE_REPRESENTATION = "/encoding/manifests/dash/%s/periods/%s/adaptationsets/%s/representations/fmp4";
     public static final String ENDPOINT_START_ENCODING = "/encoding/encodings/%s/start";
+    public static final String ENDPOINT_GET_CODEC_VIDEO = "/encoding/configurations/video/h264/%s";
+    public static final String ENDPOINT_LIST_CODEC_VIDEO = "/encoding/configurations/video/h264";
+    public static final String ENDPOINT_GET_CODEC_AUDIO = "/encoding/configurations/audio/aac/%s";
+    public static final String ENDPOINT_LIST_CODEC_AUDIO = "/encoding/configurations/audio/aac";
 
 
     @Autowired
     RestTemplate restTemplate;
 
-    Logger log = LoggerFactory.getLogger(BitmovinApi.class);
-
     public BitmovinApi() {}
 
-    public PostEncodingResponseModel createEncoding() {
+    public String createEncoding() {
         PostEncodingRequestModel body = new PostEncodingRequestModel(ENCODING_NAME, ENCODER_VERSION);
         HttpHeaders header = getHeaders();
 
@@ -65,13 +64,13 @@ public class BitmovinApi {
         ResponseEntity<PostEncodingResponseModel> response = restTemplate.exchange(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_ENCODING, HttpMethod.POST, request, PostEncodingResponseModel.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar encoding!");
         }
     }
 
-    public PostStreamsResponseModel createStreams(String inputId, String encodingId, String inputPath, String codecConfigId) {
+    public String createStreams(String inputId, String encodingId, String inputPath, String codecConfigId) {
         PostStreamsRequestModel.StreamInput streamInput = new PostStreamsRequestModel.StreamInput(inputId, inputPath, "AUTO");
 
         ArrayList<PostStreamsRequestModel.StreamInput> streamInputArrayList = new ArrayList<>();
@@ -87,13 +86,13 @@ public class BitmovinApi {
         ResponseEntity<PostStreamsResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostStreamsResponseModel.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar stream!");
         }
     }
 
-    public PostMuxingFM4ResponseModel createMuxingFM4(String outputId, String encodingId, String streamId, String outputPath) {
+    public String createMuxingFM4(String outputId, String encodingId, String streamId, String outputPath) {
         ArrayList<AclEntryModel> aclEntries = new ArrayList<>();
         aclEntries.add(new AclEntryModel());
 
@@ -116,13 +115,13 @@ public class BitmovinApi {
         ResponseEntity<PostMuxingFM4ResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostMuxingFM4ResponseModel.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar muxing!");
         }
     }
 
-    public PostManifestResponseModel createManifest(String outputId, String outputPath) {
+    public String createManifest(String outputId, String outputPath) {
         ArrayList<AclEntryModel> aclEntries = new ArrayList<>();
         aclEntries.add(new AclEntryModel());
 
@@ -139,13 +138,13 @@ public class BitmovinApi {
         ResponseEntity<PostManifestResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostManifestResponseModel.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar manifest!");
         }
     }
 
-    public PostPeriodResponseModel createPeriod(String manifestId) {
+    public String createPeriod(String manifestId) {
         HttpHeaders header = getHeaders();
 
         String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_PERIOD, manifestId);
@@ -155,13 +154,13 @@ public class BitmovinApi {
         ResponseEntity<PostPeriodResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostPeriodResponseModel.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar period!");
         }
     }
 
-    public PostAudioAdaptationSetResponseModel createAudioAdaptationSet(String manifestId, String periodId) {
+    public String createAudioAdaptationSet(String manifestId, String periodId) {
         PostAudioAdaptationSetRequestModel body = new PostAudioAdaptationSetRequestModel("pt");
         HttpHeaders header = getHeaders();
 
@@ -172,13 +171,13 @@ public class BitmovinApi {
         ResponseEntity<PostAudioAdaptationSetResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostAudioAdaptationSetResponseModel.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar audio adaptation set!");
         }
     }
 
-    public PostVideoAdaptationSetResponseModel createVideoAdaptationSet(String manifestId, String periodId) {
+    public String createVideoAdaptationSet(String manifestId, String periodId) {
         HttpHeaders header = getHeaders();
 
         String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_VIDEO_ADAPTATION_SET, manifestId, periodId);
@@ -188,13 +187,13 @@ public class BitmovinApi {
         ResponseEntity<PostVideoAdaptationSetResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostVideoAdaptationSetResponseModel.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar video adaptation set!");
         }
     }
 
-    public PostRepresentationResponseModel createRepresentation(String manifestId, String periodId, String adaptationSetId, String encodingId, String muxingId, String segmentPath) {
+    public String createRepresentation(String manifestId, String periodId, String adaptationSetId, String encodingId, String muxingId, String segmentPath) {
         PostRepresentationRequestModel body = new PostRepresentationRequestModel("TEMPLATE", encodingId, muxingId, segmentPath);
         HttpHeaders header = getHeaders();
 
@@ -205,13 +204,13 @@ public class BitmovinApi {
         ResponseEntity<PostRepresentationResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostRepresentationResponseModel.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar representation!");
         }
     }
 
-    public PostStartEncodingResponse startEncoding(String encodingId, String manifestId) {
+    public String startEncoding(String encodingId, String manifestId) {
         ManifestResourceModel manifestResource = new ManifestResourceModel(manifestId);
         ArrayList<ManifestResourceModel> manifestResourceArrayList = new ArrayList<>();
         manifestResourceArrayList.add(manifestResource);
@@ -226,9 +225,9 @@ public class BitmovinApi {
         ResponseEntity<PostStartEncodingResponse> response = restTemplate.exchange(url, HttpMethod.POST, request, PostStartEncodingResponse.class);
 
         if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
-            return response.getBody();
+            return response.getBody().getData().getResult().getId();
         } else {
-            return null;
+            throw new InvalidStateException("Falha ao criar representation!");
         }
     }
 
