@@ -18,28 +18,7 @@ Para executar essa aplicação em seu computador, siga os passos abaixo:
 $ git clone https://github.com/weullerk/DesafioSambaTech
 ```
 
-2) Crie um banco de dados e configure os dados de conexão no arquivo `.env`
+## Configuração
 
-```
-DB_CONNECTION=
-DB_HOST=
-DB_PORT=
-DB_DATABASE=
-DB_USERNAME=
-DB_PASSWORD=
-```
-
-```
-
-#### Admin
-
-As rotas desse módulo encontra-se no arquivo `routes/web.php`. A interface administrativa é acessada utilizando o usuário/senha do Active Directory do Sebrae Minas. Para funcionar, será necessário informar no arquivo `.env` uma credencial de consulta no AD:
-
-```
-LDAP_USERNAME=
-LDAP_PASSWORD=
-```
-
-As telas foram desenvolvidas utilizando o [MaterializeCSS](http://materializecss.com/).
-
-Está sendo utilizado o [Laravel Mix](https://laravel.com/docs/5.4/mix) para compilar os assets.
+As configurações das api do bitmovin e cloud(azure) deverão ser inseridas no arquivo application.properties.
+O arquivo atual 'rename_application.properties' deve ser renomeado para 'application.properties'.
