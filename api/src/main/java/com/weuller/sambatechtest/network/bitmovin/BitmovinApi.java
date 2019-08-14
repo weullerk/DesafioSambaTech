@@ -10,6 +10,9 @@ import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4Re
 import com.weuller.sambatechtest.network.bitmovin.models.muxings.PostMuxingFM4ResponseModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsRequestModel;
 import com.weuller.sambatechtest.network.bitmovin.models.streams.PostStreamsResponseModel;
+import com.weuller.sambatechtest.services.EncodingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -49,6 +52,8 @@ public class BitmovinApi {
 
     @Autowired
     RestTemplate restTemplate;
+
+    Logger log = LoggerFactory.getLogger(EncodingService.class);
 
     public BitmovinApi() {}
 
@@ -146,7 +151,7 @@ public class BitmovinApi {
 
         String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_PERIOD, manifestId);
 
-        HttpEntity<String> request = new HttpEntity<String>("", header);
+        HttpEntity<String> request = new HttpEntity<String>("{}", header);
 
         ResponseEntity<PostPeriodResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostPeriodResponseModel.class);
 
@@ -179,7 +184,7 @@ public class BitmovinApi {
 
         String url = String.format(BitmovinApi.BASE_URL + BitmovinApi.ENDPOINT_CREATE_VIDEO_ADAPTATION_SET, manifestId, periodId);
 
-        HttpEntity request = new HttpEntity(header);
+        HttpEntity<String> request = new HttpEntity("{}", header);
 
         ResponseEntity<PostVideoAdaptationSetResponseModel> response = restTemplate.exchange(url, HttpMethod.POST, request, PostVideoAdaptationSetResponseModel.class);
 
@@ -221,10 +226,10 @@ public class BitmovinApi {
 
         ResponseEntity<PostStartEncodingResponse> response = restTemplate.exchange(url, HttpMethod.POST, request, PostStartEncodingResponse.class);
 
-        if (response.getStatusCode() == HttpStatus.CREATED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
+        if (response.getStatusCode() == HttpStatus.ACCEPTED && response.getBody().getStatus().equals(RESPONSE_STATUS_SUCCESS)) {
             return response.getBody().getData().getResult().getId();
         } else {
-            throw new InvalidStateException("Falha ao criar representation!");
+            throw new InvalidStateException("Falha ao criar encoding!");
         }
     }
 
